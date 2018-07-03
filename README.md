@@ -3,7 +3,7 @@ This repository contains notes and tools for dealing with MFA using the AWS CLI.
 
 At a high level, it's possible that the optimal way to use the AWS CLI is from an EC2 instance within the environment with an appropriate instance role attached. This does pose the problem that you then need to be concerned with controlling access to that instance, and the audit trail of API calls will record the instance as the principal in calls, rather than the actual user.
 
-There is another complication with that scenario - in order to maintain the instance, and probably IAM assets around it's access, you need operate from outside the instance itself, probably from an administrator or developer's computer.
+There is another complication with that scenario - in order to maintain the instance, and probably IAM assets around it's access, you need to operate from outside the instance itself, probably from an administrator or developer's computer.
 
 Providing a fairly high level of access for a principal to act off their computer is a risky proposition. If you are willing to operate purely through the AWS console, then you can require MFA in addition to the user ID / password pair. We're interested though in good DevSecOps practices, and doing things manually through the console are not best practice.
 
@@ -17,7 +17,7 @@ At the base of authentication for the AWS CLI are the CLI configuration files. T
  - credentials in the `credentials` file are tagged with `[name]`, but `config` entries tagged with `[profile name]`
  - `[default]` config applies to all profiles unless overridden, `[default]` credential is the default principal identifier
  - `$AWS_PROFILE` can be used to specify a profile rather than passing it at as a CLI parameter
- - `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` override entries in config files, and can use $AWS_SESSION_TOKEN - see <https://docs.aws.amazon.com/cli/latest/userguide/cli-environment.html>
+ - `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_ACCESS_KEY` override entries in config files, and you can use `$AWS_SESSION_TOKEN` - see <https://docs.aws.amazon.com/cli/latest/userguide/cli-environment.html>
 
 Storing credentials in the `~/.aws/credentials` file is quite risky - it's good practice to ensure that directory and it's contents are only readable by the owner, however the credentials are in plain text, so if the computer is compromised they should be considered to be breached. If the simple credential pair can be further constrained using MFA, the security risk is significantly reduced.
 
@@ -55,9 +55,11 @@ aws_secret_access_key=GS+uUxUeBJ0f7wnFTLP8+C0nTO/iEe5cuFMMj6Lc
 aws_session_token=FQoDYXdzEFsaDEBVOb7NNZ0WL0g5xCKwATh8Yo+p0XJQDwO5iMrEd9ajopwuK9ZFK7V61it/e+JrK0RQvgyAedB9R5n7r/fXHg/Ak6YACe9DtlhVpX8Ww8VWbxlMibruc4/DtZKXT8n7UbREfFAnl1rhSD18iFUd39uuuu1dOVtqYwJUob7MzUUMs3vypk66ARWyHcd1H+S0PgnnUbN/ynvhq+BREtEgBX4UIrbxByzYskSC2x6v8oDnrCj+9HHgKGICm/Yj6f0LKIOI7dkF
 ```
 
-At a glance this looks pretty useful - you've got some credentials with a fixed life span (you can specify a shorter lifespan, the default is quite long - see <https://docs.aws.amazon.com/cli/latest/reference/sts/get-session-token.html> for more information), even if it's a bit fiddly to get them in play for subsequent CLI calls. There's some problems though.
+At a glance this looks pretty useful - you've got some credentials with a fixed life span even if it's a bit fiddly to get them in play for subsequent CLI calls. Note you can specify a shorter lifespan, as the default is quite long - see <https://docs.aws.amazon.com/cli/latest/reference/sts/get-session-token.html> for more information.
 
-To begin with (see <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_getsessiontoken.html>) you cannot use the temporary credentials to use the IAM or STS API. More critically, you still needed to have provided credentials for the IAM user in order to be able to request the temporary credential. It's not particularly obvious, but does need to be spelled out: even though you have different credentials, you still operate as the same principal, although all subsequent calls carry an indication that MFA has been enabled.
+There's some problems though.
+
+To begin with you cannot use the temporary credentials to use the IAM or STS API (see <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_getsessiontoken.html>). More critically, you still had to have provided credentials for the IAM user in order to be able to request the temporary credential. It's not particularly obvious, but does need to be spelled out: even though you have different credentials, you still operate as the same principal, although all subsequent calls carry an indication that MFA has been enabled.
 
 This does suggest one route forward - the user (or better the user's group) - could have a policy that allowed calling _GetSessionToken_ without restriction, but then require MFA to be enabled for any other actions. This is feasible if the principal has a fairly limited set of permissions, but could get cumbersome for an administration or development account.
 
