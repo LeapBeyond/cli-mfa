@@ -64,3 +64,22 @@ To begin with you cannot use the temporary credentials to use the IAM or STS API
 This does suggest one route forward - the user (or better the user's group) - could have a policy that allowed calling _GetSessionToken_ without restriction, but then require MFA to be enabled for any other actions. This is feasible if the principal has a fairly limited set of permissions, but could get cumbersome for an administration or development account.
 
 The `mfa.sh` script is one possible way of making obtaining and using the token a little less cumbersome. Note this is just a sketch, the ARN of the MFA key is hard-wired, which is sub-optimal. Nevertheless, invoking the script with the MFA session token will parse the JSON and launch a new shell with the appropriate environmental variables set to overload whatever credentials are specified in the files.
+
+It's useful when testing this to look at the CloudTrail logs to verify that you wind up with the expected principal - in my case I could see the expected snippet:
+
+```
+"userIdentity": {
+    "type": "IAMUser",
+    "principalId": "AIDAI2O37N4DXSYCLZBW2",
+    "arn": "arn:aws:iam::931304388919:user/devuser",
+    "accountId": "931304388919",
+    "accessKeyId": "ASIAJCOAUNBB4H4BZRIQ",
+    "userName": "devuser",
+    "sessionContext": {
+        "attributes": {
+            "mfaAuthenticated": "true",
+            "creationDate": "2018-07-03T14:24:39Z"
+        }
+    }
+},
+```
