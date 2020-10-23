@@ -355,7 +355,7 @@ In either of these cases, it cannot be emphasised enough: the actual secrets sho
 
 
 ## License
-Copyright 2018 Leap Beyond Analytics
+Copyright 2018 Leap Beyond Emerging Technologies B.V.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
