@@ -352,3 +352,19 @@ Alternatively, the `vault` server has a RESTful HTTP API which could be used eff
 Configuring vault is well outside the scope of this current work, however the following article from Hashicorp has some useful starting thoughts: <https://www.hashicorp.com/blog/codifying-vault-policies-and-configuration>. Another article worth looking at discusses using Terraform to configure Vault, pointing out that the Hashicorp suggestion is only really useful for additive changes, whereas because Terraform is stateful you may be able to get a happier experience with it: <https://theartofmachinery.com/2017/07/15/use_terraform_with_vault.html>. Note that this article does not encompass setting up a `vault` cluster, just provisioning of configurations into it.
 
 In either of these cases, it cannot be emphasised enough: the actual secrets should still be added to `vault` manually. There are other issues around integrating Terraform and Vault that need to be considered, this article is a starting point: <https://www.greenreedtech.com/mitigating-terraform-secrets-exposure/>. It includes suggestions around mitigating the risks, but the bottom line is that while you might use Terraform to set up and configure `vault`, reading and writing secrets with [Terraform](https://www.terraform.io/docs/providers/vault/index.html) is currently not a good idea.
+
+
+## License
+Copyright 2018 Leap Beyond Emerging Technologies B.V.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
